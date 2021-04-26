@@ -1,0 +1,7 @@
+go.mod
+go.sum
+migrations/*
+config_file/.env
+log_files/error/*
+log_files/info/*
+log_files/screenshots/*

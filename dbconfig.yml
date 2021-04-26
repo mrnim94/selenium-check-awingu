@@ -1,0 +1,5 @@
+development:
+  dialect: postgres
+  datasource: host=192.168.101.5 port=5432 user=nim password=nim123 dbname=testing_awingu sslmode=disable
+  dir: migrations
+  table: migrations

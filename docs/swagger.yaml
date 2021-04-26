@@ -1,0 +1,346 @@
+basePath: /
+definitions:
+  model.Response:
+    properties:
+      code:
+        type: integer
+      data:
+        type: object
+      message:
+        type: string
+    type: object
+  req.RequestAddGithubJob:
+    properties:
+      accessToken:
+        type: string
+      jobID:
+        type: string
+      owner:
+        type: string
+      path:
+        type: string
+      repo:
+        type: string
+    required:
+    - accessToken
+    - jobID
+    - owner
+    - path
+    - repo
+    type: object
+  req.RequestAddJob:
+    properties:
+      jobName:
+        type: string
+      status:
+        type: integer
+    required:
+    - jobName
+    - status
+    type: object
+  req.RequestAddUserJob:
+    properties:
+      jobId:
+        type: string
+      password:
+        type: string
+      status:
+        type: integer
+      userName:
+        type: string
+    required:
+    - jobId
+    - password
+    - status
+    - userName
+    type: object
+  req.RequestRunJobs:
+    properties:
+      endTime:
+        type: integer
+      jobId:
+        type: string
+      startTime:
+        type: integer
+    required:
+    - endTime
+    - jobId
+    - startTime
+    type: object
+  req.RequestRunTest:
+    properties:
+      testId:
+        type: string
+    required:
+    - testId
+    type: object
+  req.RequestTesting:
+    properties:
+      jodName:
+        type: string
+    required:
+    - jodName
+    type: object
+host: localhost:7000
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server Petstore server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Tool Testing API
+  version: "1.0"
+paths:
+  /report/jobs-testing:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Hiện thị các Job Testing
+      tags:
+      - report-testing-service
+  /report/run-jobs:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: testing
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/req.RequestRunJobs'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Hiện thị các Testing chạy trong 1 Job
+      tags:
+      - report-testing-service
+  /report/run-test:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: testing
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/req.RequestRunTest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Hiện thị chi tiết các bước chạy trong 1 testing
+      tags:
+      - report-testing-service
+  /tester/add-github:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: testing
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/req.RequestAddGithubJob'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Thêm thông tin Github cho tool testing
+      tags:
+      - testing-service
+  /tester/add-job:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: testing
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/req.RequestAddJob'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/model.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Thêm Job cho tool testing
+      tags:
+      - testing-service
+  /tester/add-user:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: testing
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/req.RequestAddUserJob'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Thêm thông tin User sử dụng cho bài test
+      tags:
+      - testing-service
+  /tester/delete-job/{jobID}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: testing
+        in: path
+        name: jobID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/model.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Xóa Job cho tool testing
+      tags:
+      - testing-service
+  /tester/run-testing:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: testing
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/req.RequestTesting'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Chạy testing bằng tên Job
+      tags:
+      - testing-service
+swagger: "2.0"
