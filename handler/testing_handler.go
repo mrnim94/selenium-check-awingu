@@ -7,8 +7,10 @@ import (
 	"net/http"
 	"selenium-check-awingu/helper/automate"
 	"selenium-check-awingu/helper/git/git_impl"
+	"selenium-check-awingu/helper/restclient"
 	"selenium-check-awingu/log"
 	"selenium-check-awingu/model"
+	"selenium-check-awingu/model/alert"
 	req "selenium-check-awingu/model/req"
 	"selenium-check-awingu/model/testing"
 	"selenium-check-awingu/repository"
@@ -18,6 +20,8 @@ import (
 type TestingHandler struct {
 	TestingRepo repository.TestingRepo
 	Automate    automate.Automate
+	AlertRepo repository.AlertRepo
+	RestClient restclient.RestClient
 }
 
 // RunTesting godoc
@@ -151,8 +155,20 @@ func (t *TestingHandler) HandlerRunTesting(c echo.Context) error {
 		}
 	}
 
+	var tele alert.TelegramInfo
+	if jobTesting.AlertTelegram != "no" {
+		tele, err = t.AlertRepo.SelectTelegramInfoByName(c.Request().Context(), jobTesting.AlertTelegram)
+		if err != nil {
+			return c.JSON(http.StatusConflict, model.Response{
+				StatusCode: http.StatusConflict,
+				Message:    err.Error(),
+				Data:       nil,
+			})
+		}
+	}
+
 	for _, user := range jobUsers {
-		go t.Automate.RobotAutoImpl(*yml, user, t.TestingRepo, jobTesting.JobId)
+		go t.Automate.RobotAutoImpl(*yml, user, t.TestingRepo, jobTesting, tele, t.RestClient)
 	}
 
 	return c.JSON(http.StatusOK, model.Response{
@@ -213,6 +229,7 @@ func (t *TestingHandler) HandlerAddJob(c echo.Context) error {
 		JobId: jobId.String(),
 		JobName:   req.JobName,
 		Status:    req.Status,
+		AlertTelegram: "no",
 	}
 
 	jobTest, err = t.TestingRepo.SaveJobTest(c.Request().Context(), jobTest)
@@ -238,10 +255,7 @@ func (t *TestingHandler) HandlerAddJob(c echo.Context) error {
 // @Produce  json
 // @Param jobID path string true "testing"
 // @Success 200 {object} model.Response
-// @Failure 400 {object} model.Response
-// @Failure 403 {object} model.Response
 // @Failure 409 {object} model.Response
-// @Failure 500 {object} model.Response
 // @Router /tester/delete-job/{jobID} [delete]
 func (t *TestingHandler) HandlerDeleteJob(c echo.Context) error {
 	jobID := c.Param("jobid")
@@ -269,7 +283,6 @@ func (t *TestingHandler) HandlerDeleteJob(c echo.Context) error {
 // @Produce  json
 // @Param data body req.RequestAddGithubJob true "testing"
 // @Success 200 {object} model.Response
-// @Failure 400 {object} model.Response
 // @Failure 409 {object} model.Response
 // @Failure 500 {object} model.Response
 // @Router /tester/add-github [post]
@@ -329,7 +342,6 @@ func (t *TestingHandler) HandlerAddGithubJob(c echo.Context) error {
 // @Produce  json
 // @Param data body req.RequestAddUserJob true "testing"
 // @Success 200 {object} model.Response
-// @Failure 400 {object} model.Response
 // @Failure 409 {object} model.Response
 // @Failure 500 {object} model.Response
 // @Router /tester/add-user [post]
@@ -378,5 +390,61 @@ func (t *TestingHandler) HandlerAddUserJob(c echo.Context) error {
 		StatusCode: http.StatusOK,
 		Message:    "Xử lý thành công",
 		Data:       jobUser,
+	})
+}
+
+// RunTesting godoc
+// @Summary Add Alert Telegram cho Job khi có lỗi error
+// @Tags testing-service
+// @Accept  json
+// @Produce  json
+// @Param data body req.RequestUpdateAlertTelegramJob true "testing"
+// @Success 200 {object} model.Response
+// @Failure 409 {object} model.Response
+// @Failure 500 {object} model.Response
+// @Router /tester/update-alert-telegram [post]
+func (t *TestingHandler) HandlerUpdateAlertTelegramForJob(c echo.Context) error {
+	req := req.RequestUpdateAlertTelegramJob{}
+
+	if err := c.Bind(&req); err != nil {
+		log.Error(err.Error())
+		return c.JSON(http.StatusBadRequest, model.Response{
+			StatusCode: http.StatusBadRequest,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	} else {
+		log.Info("bắt đầu sử lý request Update Alert Telegram cho Job : " + req.JobId)
+	}
+
+	if err := c.Validate(req); err != nil {
+		log.Error(err.Error())
+		return c.JSON(http.StatusBadRequest, model.Response{
+			StatusCode: http.StatusBadRequest,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	} else {
+		log.Info("kiểm trả các thông số gửi lên cho Update Alert Telegram cho Job : " + req.JobId + " thành công")
+	}
+
+	alertTele := model.JobsTesting{
+		JobId:        req.JobId,
+		AlertTelegram: req.AlertTelegram,
+	}
+
+	result, err := t.TestingRepo.UpdateAlertTelegramForJob(c.Request().Context(), alertTele)
+	if err != nil {
+		return c.JSON(http.StatusConflict, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "Xử lý thành công",
+		Data:       result,
 	})
 }

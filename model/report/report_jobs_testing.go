@@ -11,4 +11,5 @@ type ReportJobsTesting struct {
 	Owner     string    `json:"owner,omitempty" db:"owner, omitempty"`
 	Repo      string    `json:"repo,omitempty" db:"repo, omitempty"`
 	Path      string    `json:"path,omitempty" db:"path, omitempty"`
+	AlertTelegram   string    `json:"alertTelegram,omitempty" db:"alert_telegram, omitempty"`
 }

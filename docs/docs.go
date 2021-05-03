@@ -33,6 +33,124 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/alert/add-telegram": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Alert-service"
+                ],
+                "summary": "Add thông tin telegram để alert",
+                "parameters": [
+                    {
+                        "description": "alert",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/req.RequestInfoTelegram"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/alert/delete-telegram": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Alert-service"
+                ],
+                "summary": "xóa thông tin telegram để alert",
+                "parameters": [
+                    {
+                        "description": "alert",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/req.RequestDeleteTelegram"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/alert/list-telegram": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Alert-service"
+                ],
+                "summary": "Hiển thị thông tin telegram để alert",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/report/jobs-testing": {
             "get": {
                 "consumes": [
@@ -151,6 +269,130 @@ var doc = `{
                 }
             }
         },
+        "/schedule/add": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "schedule-service"
+                ],
+                "summary": "Add schedule để check testing",
+                "parameters": [
+                    {
+                        "description": "schedule",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/req.RequestAddSchedule"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/schedule/delete": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "schedule-service"
+                ],
+                "summary": "Xóa schedule để check testing",
+                "parameters": [
+                    {
+                        "description": "schedule",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/req.RequestDeleteSchedule"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/schedule/list": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "schedule-service"
+                ],
+                "summary": "Hiện thị các schedule",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/tester/add-github": {
             "post": {
                 "consumes": [
@@ -177,12 +419,6 @@ var doc = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/model.Response"
                         }
@@ -289,12 +525,6 @@ var doc = `{
                             "$ref": "#/definitions/model.Response"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/model.Response"
-                        }
-                    },
                     "409": {
                         "description": "Conflict",
                         "schema": {
@@ -338,26 +568,8 @@ var doc = `{
                             "$ref": "#/definitions/model.Response"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/model.Response"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/model.Response"
-                        }
-                    },
                     "409": {
                         "description": "Conflict",
-                        "schema": {
-                            "$ref": "#/definitions/model.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/model.Response"
                         }
@@ -403,6 +615,51 @@ var doc = `{
                     },
                     "404": {
                         "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/tester/update-alert-telegram": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "testing-service"
+                ],
+                "summary": "Add Alert Telegram cho Job khi có lỗi error",
+                "parameters": [
+                    {
+                        "description": "testing",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/req.RequestUpdateAlertTelegramJob"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
                         "schema": {
                             "$ref": "#/definitions/model.Response"
                         }
@@ -474,6 +731,29 @@ var doc = `{
                 }
             }
         },
+        "req.RequestAddSchedule": {
+            "type": "object",
+            "required": [
+                "atTime",
+                "day",
+                "every",
+                "jobName"
+            ],
+            "properties": {
+                "atTime": {
+                    "type": "string"
+                },
+                "day": {
+                    "type": "string"
+                },
+                "every": {
+                    "type": "string"
+                },
+                "jobName": {
+                    "type": "string"
+                }
+            }
+        },
         "req.RequestAddUserJob": {
             "type": "object",
             "required": [
@@ -493,6 +773,51 @@ var doc = `{
                     "type": "integer"
                 },
                 "userName": {
+                    "type": "string"
+                }
+            }
+        },
+        "req.RequestDeleteSchedule": {
+            "type": "object",
+            "required": [
+                "scheduleId"
+            ],
+            "properties": {
+                "scheduleId": {
+                    "type": "string"
+                }
+            }
+        },
+        "req.RequestDeleteTelegram": {
+            "type": "object",
+            "required": [
+                "telegramName"
+            ],
+            "properties": {
+                "telegramName": {
+                    "type": "string"
+                }
+            }
+        },
+        "req.RequestInfoTelegram": {
+            "type": "object",
+            "required": [
+                "chatId",
+                "disableNotification",
+                "telegramName",
+                "telegramToken"
+            ],
+            "properties": {
+                "chatId": {
+                    "type": "string"
+                },
+                "disableNotification": {
+                    "type": "string"
+                },
+                "telegramName": {
+                    "type": "string"
+                },
+                "telegramToken": {
                     "type": "string"
                 }
             }
@@ -533,6 +858,25 @@ var doc = `{
                 "jodName"
             ],
             "properties": {
+                "jodName": {
+                    "type": "string"
+                }
+            }
+        },
+        "req.RequestUpdateAlertTelegramJob": {
+            "type": "object",
+            "required": [
+                "alertTelegram",
+                "jobId",
+                "jodName"
+            ],
+            "properties": {
+                "alertTelegram": {
+                    "type": "string"
+                },
+                "jobId": {
+                    "type": "string"
+                },
                 "jodName": {
                     "type": "string"
                 }

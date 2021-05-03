@@ -3,6 +3,7 @@ package testing
 import (
 	"gopkg.in/yaml.v2"
 	"reflect"
+	"selenium-check-awingu/model/alert"
 )
 
 type YamlTesting struct {
@@ -32,6 +33,8 @@ type PlusInfoActionTesting struct {
 	WebElement      WebElement
 	CheckElements   CheckElements
 	Actions         reflect.Value
+	AlertTelegram string
+	TelegramInfo alert.TelegramInfo
 }
 
 type WebElement struct {

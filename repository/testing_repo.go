@@ -15,5 +15,6 @@ type TestingRepo interface {
 	RemoveJobTest(context context.Context, jobID string) error
 	SaveJobGithub(context context.Context, github model.JobsGithub) (model.JobsGithub, error)
 	SaveJobUser(context context.Context, user model.JobsUser) (model.JobsUser, error)
-
+	UpdateAlertTelegramForJob(context context.Context, job model.JobsTesting) (model.JobsTesting, error)
+	DisableAlertTelegramJob(context context.Context, AlertTele string) ([]model.JobsTesting, error)
 }

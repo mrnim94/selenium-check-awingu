@@ -6,7 +6,7 @@ import (
 	"selenium-check-awingu/log"
 )
 
-var webDriver selenium.WebDriver
+//var webDriver selenium.WebDriver
 
 type Selenium struct {
 	Browser       string

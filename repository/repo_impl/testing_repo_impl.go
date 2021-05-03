@@ -92,8 +92,8 @@ func (u *TestingRepoImpl) SaveActionOfUser(context context.Context, userAction t
 
 func (u *TestingRepoImpl) SaveJobTest(context context.Context, job model.JobsTesting) (model.JobsTesting, error) {
 	statement := `
-		INSERT INTO jobs_testing(job_id, job_name, status, created_at, updated_at)
-		VALUES(:job_id, :job_name, :status, :created_at, :updated_at)
+		INSERT INTO jobs_testing(job_id, job_name, status, alert_telegram, created_at, updated_at)
+		VALUES(:job_id, :job_name, :status, :alert_telegram, :created_at, :updated_at)
 	`
 
 	job.CreatedAt = time.Now()
@@ -156,6 +156,33 @@ func (u *TestingRepoImpl) SaveJobUser(context context.Context, user model.JobsUs
 	return user, nil
 }
 
+func (u *TestingRepoImpl) UpdateAlertTelegramForJob(context context.Context, job model.JobsTesting) (model.JobsTesting, error) {
+	statement := `
+		UPDATE jobs_testing
+		SET
+			alert_telegram  = (CASE WHEN LENGTH(:alert_telegram) = 0 THEN alert_telegram ELSE :alert_telegram END),
+			updated_at 	  = COALESCE (:updated_at, updated_at)
+		WHERE job_id    = :job_id
+	`
+	job.UpdatedAt = time.Now()
+	result, err := u.sql.Db.NamedExecContext(context, statement, job)
+	if err != nil {
+		log.Error(err.Error())
+		return job, err
+	}
+
+	count, err := result.RowsAffected()
+	if err != nil {
+		log.Error(err.Error())
+		return job, banana.JobNotUpdatedAlertTelegram
+	}
+	if count == 0 {
+		return job, banana.JobNotUpdatedAlertTelegram
+	}
+
+	return job, nil
+}
+
 func (u *TestingRepoImpl) RemoveJobTest(context context.Context, jobID string) error {
 	resultUser := u.sql.Db.MustExecContext(
 		context,
@@ -191,4 +218,25 @@ func (u *TestingRepoImpl) RemoveJobTest(context context.Context, jobID string) e
 	}
 
 	return nil
+}
+
+func (u *TestingRepoImpl) DisableAlertTelegramJob(context context.Context, teleName string) ([]model.JobsTesting, error) {
+	var jobs []model.JobsTesting
+
+	udpateAt := time.Now()
+	err := u.sql.Db.SelectContext(context, &jobs,
+		`
+			UPDATE jobs_testing
+			SET
+				alert_telegram = 'no',
+				updated_at = COALESCE ($1, updated_at)
+			WHERE alert_telegram=$2
+		`, udpateAt, teleName)
+	/////////////
+	if err != nil {
+		log.Error(err.Error())
+		return jobs, err
+	}
+
+	return jobs, nil
 }

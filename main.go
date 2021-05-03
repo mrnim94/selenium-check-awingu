@@ -18,21 +18,14 @@ import (
 	"selenium-check-awingu/repository/repo_impl"
 	"selenium-check-awingu/router"
 	"time"
-	"runtime"
 )
 
 func init() {
-	os.Setenv("APP_NAME", "backend_testing_pro")
+	os.Setenv("APP_NAME", "backend_testing_dev")
 	log.InitLogger(false)
 	os.Setenv("TZ", "Asia/Ho_Chi_Minh")
-	var configPath string
-	if runtime.GOOS == "windows" {
-		configPath = "./config_file/.env"
-	} else {
-		configPath = "../../config_file/.env"
-	}
 	// loads values from .env into the system
-	if err := godotenv.Load(configPath); err != nil {
+	if err := godotenv.Load("config_file/.env"); err != nil {
 		log.Print("No .env file found")
 	}
 }
@@ -90,12 +83,7 @@ func main() {
 	//Scheduler
 	scheduleNim.GetGoCron()
 
-	connectTelegramApi, exists := os.LookupEnv("CONNECT_TELEGRAM_API")
-	if !(exists) {
-		log.Error(exists)
-		return
-	}
-	urlTelegramApi := restclient_impl.Resty{Url: connectTelegramApi}
+	urlTelegramApi := restclient_impl.Resty{Url: "https://api.telegram.org"}
 
 	e := echo.New()
 	e.GET("/swagger/*", echoSwagger.WrapHandler)

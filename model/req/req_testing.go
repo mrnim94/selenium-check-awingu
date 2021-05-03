@@ -37,3 +37,8 @@ type RequestAddUserJob struct {
 	JobId     string    `json:"jobId,omitempty" validate:"required"`
 	Status    int    `json:"status,omitempty" validate:"required"`
 }
+
+type RequestUpdateAlertTelegramJob struct {
+	JobId     string `json:"jobId,omitempty" validate:"required"`
+	AlertTelegram   string    `json:"alertTelegram,omitempty" validate:"required"`
+}

@@ -53,6 +53,8 @@ func PluginScreenShotWarning(conctRemote selenium.WebDriver, contentTesting test
 		log.Error(err.Error())
 		return err
 	}
+
+
 	//////////END log action
 	log.Info(contentTesting.NameTest + " - step " + strconv.Itoa(pIAT.OrdinalStep) +
 		" " + pIAT.DescriptionStep + " Hoàn thành ghi nhận Warning")

@@ -18,4 +18,6 @@ var (
 
 	ActionConflict     = errors.New("Action bị trùng")
 	ActionFail         = errors.New("Ghi nhận Action thất bại")
+
+	JobNotUpdatedAlertTelegram = errors.New("Update alert telegram cho job bị lỗi")
 )

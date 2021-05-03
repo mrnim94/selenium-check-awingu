@@ -38,6 +38,22 @@ definitions:
     - jobName
     - status
     type: object
+  req.RequestAddSchedule:
+    properties:
+      atTime:
+        type: string
+      day:
+        type: string
+      every:
+        type: string
+      jobName:
+        type: string
+    required:
+    - atTime
+    - day
+    - every
+    - jobName
+    type: object
   req.RequestAddUserJob:
     properties:
       jobId:
@@ -53,6 +69,36 @@ definitions:
     - password
     - status
     - userName
+    type: object
+  req.RequestDeleteSchedule:
+    properties:
+      scheduleId:
+        type: string
+    required:
+    - scheduleId
+    type: object
+  req.RequestDeleteTelegram:
+    properties:
+      telegramName:
+        type: string
+    required:
+    - telegramName
+    type: object
+  req.RequestInfoTelegram:
+    properties:
+      chatId:
+        type: string
+      disableNotification:
+        type: string
+      telegramName:
+        type: string
+      telegramToken:
+        type: string
+    required:
+    - chatId
+    - disableNotification
+    - telegramName
+    - telegramToken
     type: object
   req.RequestRunJobs:
     properties:
@@ -81,6 +127,19 @@ definitions:
     required:
     - jodName
     type: object
+  req.RequestUpdateAlertTelegramJob:
+    properties:
+      alertTelegram:
+        type: string
+      jobId:
+        type: string
+      jodName:
+        type: string
+    required:
+    - alertTelegram
+    - jobId
+    - jodName
+    type: object
 host: localhost:7000
 info:
   contact:
@@ -95,6 +154,82 @@ info:
   title: Tool Testing API
   version: "1.0"
 paths:
+  /alert/add-telegram:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: alert
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/req.RequestInfoTelegram'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Add thông tin telegram để alert
+      tags:
+      - Alert-service
+  /alert/delete-telegram:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: alert
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/req.RequestDeleteTelegram'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: xóa thông tin telegram để alert
+      tags:
+      - Alert-service
+  /alert/list-telegram:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Hiển thị thông tin telegram để alert
+      tags:
+      - Alert-service
   /report/jobs-testing:
     get:
       consumes:
@@ -171,6 +306,86 @@ paths:
       summary: Hiện thị chi tiết các bước chạy trong 1 testing
       tags:
       - report-testing-service
+  /schedule/add:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: schedule
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/req.RequestAddSchedule'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Add schedule để check testing
+      tags:
+      - schedule-service
+  /schedule/delete:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: schedule
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/req.RequestDeleteSchedule'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Xóa schedule để check testing
+      tags:
+      - schedule-service
+  /schedule/list:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Hiện thị các schedule
+      tags:
+      - schedule-service
   /tester/add-github:
     post:
       consumes:
@@ -187,10 +402,6 @@ paths:
       responses:
         "200":
           description: OK
-          schema:
-            $ref: '#/definitions/model.Response'
-        "400":
-          description: Bad Request
           schema:
             $ref: '#/definitions/model.Response'
         "409":
@@ -259,10 +470,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/model.Response'
         "409":
           description: Conflict
           schema:
@@ -291,20 +498,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/model.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/model.Response'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/model.Response'
         "409":
           description: Conflict
-          schema:
-            $ref: '#/definitions/model.Response'
-        "500":
-          description: Internal Server Error
           schema:
             $ref: '#/definitions/model.Response'
       summary: Xóa Job cho tool testing
@@ -341,6 +536,35 @@ paths:
           schema:
             $ref: '#/definitions/model.Response'
       summary: Chạy testing bằng tên Job
+      tags:
+      - testing-service
+  /tester/update-alert-telegram:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: testing
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/req.RequestUpdateAlertTelegramJob'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Add Alert Telegram cho Job khi có lỗi error
       tags:
       - testing-service
 swagger: "2.0"

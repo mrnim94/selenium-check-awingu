@@ -4,6 +4,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/tebeka/selenium"
 	"selenium-check-awingu/helper"
+	"selenium-check-awingu/helper/restclient"
 	"selenium-check-awingu/log"
 	"selenium-check-awingu/model"
 	"selenium-check-awingu/model/testing"
@@ -12,8 +13,13 @@ import (
 	"time"
 )
 
+type RestyTelegram struct {
+	RestClient restclient.RestClient
+}
+
 func PluginScreenShotError(conctRemote selenium.WebDriver, contentTesting testing.YamlTesting, userSignIn model.JobsUser,
-	testingRepo repository.TestingRepo, plusInfoActionTesting testing.PlusInfoActionTesting) error {
+	testingRepo repository.TestingRepo, plusInfoActionTesting testing.PlusInfoActionTesting,
+	restClient restclient.RestClient) error {
 	pIAT := plusInfoActionTesting
 
 	shot, err := conctRemote.Screenshot()
@@ -53,6 +59,14 @@ func PluginScreenShotError(conctRemote selenium.WebDriver, contentTesting testin
 	if err != nil {
 		log.Error(err.Error())
 		return err
+	}
+
+	messageAlert := contentTesting.NameTest + " - step " + strconv.Itoa(pIAT.OrdinalStep) +
+		" " + pIAT.DescriptionStep + " Hoàn thành ghi nhận error"
+	if pIAT.AlertTelegram != "no" {
+		log.Info(contentTesting.NameTest + " - step " + strconv.Itoa(pIAT.OrdinalStep) +
+			" " + pIAT.DescriptionStep + " Gửi TeleGram ghi nhận error")
+		err = restClient.SendMessageToGroupTelegram(messageAlert, pIAT.TelegramInfo)
 	}
 	//////////END log action
 	log.Info(contentTesting.NameTest + " - step " + strconv.Itoa(pIAT.OrdinalStep) +

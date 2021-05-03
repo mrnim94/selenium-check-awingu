@@ -5,14 +5,18 @@ import (
 	uuid "github.com/google/uuid"
 	"reflect"
 	"selenium-check-awingu/helper/automate/automate_impl/automate_plugin"
+	"selenium-check-awingu/helper/restclient"
 	"selenium-check-awingu/log"
 	"selenium-check-awingu/model"
+	"selenium-check-awingu/model/alert"
 	"selenium-check-awingu/model/testing"
 	"selenium-check-awingu/repository"
 	"strconv"
 )
 
-func (s *Selenium) RobotAutoImpl(contentTesting testing.YamlTesting, userSignIn model.JobsUser, testingRepo repository.TestingRepo, jobID string) error {
+func (s *Selenium) RobotAutoImpl(contentTesting testing.YamlTesting, userSignIn model.JobsUser,
+					testingRepo repository.TestingRepo, job model.JobsTesting, teleInfo alert.TelegramInfo,
+					restClient restclient.RestClient) error {
 	conctRemote, err := s.getRemote()
 	if err != nil {
 		log.Error(err.Error() + ">>>" + userSignIn.Username)
@@ -111,17 +115,19 @@ func (s *Selenium) RobotAutoImpl(contentTesting testing.YamlTesting, userSignIn 
 							Page:            fmt.Sprintf("%v", vHook.Field(0)),
 							OrdinalStep:     0,
 							DescriptionStep: fmt.Sprintf("%v", description),
-							JobID:           jobID,
+							JobID:           job.JobId,
 							TestId:          testId.String(),
 							WebDriver:       fmt.Sprintf("%v", webDriver),
 							Action:          "",
 							Data:            "",
+							AlertTelegram: job.AlertTelegram,
+							TelegramInfo: teleInfo,
 						}
 						err := automate_plugin.WebDriverTitle(conctRemote, contentTesting, userSignIn,
 							testingRepo, plusInfoActionTesting)
 						if err != nil {
 							automate_plugin.PluginScreenShotError(conctRemote, contentTesting, userSignIn,
-								testingRepo, plusInfoActionTesting)
+								testingRepo, plusInfoActionTesting, restClient)
 							log.Error(err.Error())
 							return err
 						}
@@ -159,20 +165,22 @@ func (s *Selenium) RobotAutoImpl(contentTesting testing.YamlTesting, userSignIn 
 							Page:            fmt.Sprintf("%v", vHook.Field(0)),
 							OrdinalStep:     0,
 							DescriptionStep: fmt.Sprintf("%v", description),
-							JobID:           jobID,
+							JobID:           job.JobId,
 							TestId:          testId.String(),
 							WebDriver:       fmt.Sprintf("%v", webDriver),
 							Action:          "",
 							Data:            "",
 							WebElement:      structWebElement,
 							Actions:         actions,
+							AlertTelegram: job.AlertTelegram,
+							TelegramInfo: teleInfo,
 						}
 						err := automate_plugin.PluginFindElement(conctRemote, contentTesting, userSignIn,
 							testingRepo, plusInfoActionTesting)
 						if err != nil {
 							plusInfoActionTesting.Data1 = fmt.Sprintf("%v", err.Error())
 							automate_plugin.PluginScreenShotError(conctRemote, contentTesting, userSignIn,
-								testingRepo, plusInfoActionTesting)
+								testingRepo, plusInfoActionTesting, restClient)
 							log.Error(err.Error())
 							return err
 						}
@@ -238,7 +246,7 @@ func (s *Selenium) RobotAutoImpl(contentTesting testing.YamlTesting, userSignIn 
 							Page:            fmt.Sprintf("%v", vHook.Field(0)),
 							OrdinalStep:     0,
 							DescriptionStep: fmt.Sprintf("%v", description),
-							JobID:           jobID,
+							JobID:           job.JobId,
 							TestId:          testId.String(),
 							WebDriver:       fmt.Sprintf("%v", webDriver),
 							Action:          "",
@@ -246,13 +254,15 @@ func (s *Selenium) RobotAutoImpl(contentTesting testing.YamlTesting, userSignIn 
 							WebElement:      structWebElement,
 							CheckElements:   structCheckElements,
 							Actions:         actions,
+							AlertTelegram: job.AlertTelegram,
+							TelegramInfo: teleInfo,
 						}
 						err := automate_plugin.PluginFindElements(conctRemote, contentTesting, userSignIn,
 							testingRepo, plusInfoActionTesting)
 						if err != nil {
 							plusInfoActionTesting.Data1 = fmt.Sprintf("%v", err.Error())
 							automate_plugin.PluginScreenShotError(conctRemote, contentTesting, userSignIn,
-								testingRepo, plusInfoActionTesting)
+								testingRepo, plusInfoActionTesting, restClient)
 							log.Error(err.Error())
 							return err
 						}
@@ -263,19 +273,21 @@ func (s *Selenium) RobotAutoImpl(contentTesting testing.YamlTesting, userSignIn 
 							Page:            fmt.Sprintf("%v", vHook.Field(0)),
 							OrdinalStep:     0,
 							DescriptionStep: fmt.Sprintf("%v", description),
-							JobID:           jobID,
+							JobID:           job.JobId,
 							TestId:          testId.String(),
 							WebDriver:       fmt.Sprintf("%v", webDriver),
 							Timeout:         fmt.Sprintf("%v", timeout),
 							Action:          "",
 							Data:            "",
+							AlertTelegram: job.AlertTelegram,
+							TelegramInfo: teleInfo,
 						}
 						err := automate_plugin.SetImplicitWaitTimeout(conctRemote, contentTesting, userSignIn,
 							testingRepo, plusInfoActionTesting)
 						if err != nil {
 							plusInfoActionTesting.Data1 = fmt.Sprintf("%v", err.Error())
 							automate_plugin.PluginScreenShotError(conctRemote, contentTesting, userSignIn,
-								testingRepo, plusInfoActionTesting)
+								testingRepo, plusInfoActionTesting, restClient)
 							log.Error(err.Error())
 							return err
 						}
@@ -286,19 +298,21 @@ func (s *Selenium) RobotAutoImpl(contentTesting testing.YamlTesting, userSignIn 
 							Page:            fmt.Sprintf("%v", vHook.Field(0)),
 							OrdinalStep:     0,
 							DescriptionStep: fmt.Sprintf("%v", description),
-							JobID:           jobID,
+							JobID:           job.JobId,
 							TestId:          testId.String(),
 							WebDriver:       fmt.Sprintf("%v", webDriver),
 							Tab:             fmt.Sprintf("%v", tab),
 							Action:          "",
 							Data:            "",
+							AlertTelegram: job.AlertTelegram,
+							TelegramInfo: teleInfo,
 						}
 						err := automate_plugin.SwitchWindow(conctRemote, contentTesting, userSignIn,
 							testingRepo, plusInfoActionTesting)
 						if err != nil {
 							plusInfoActionTesting.Data1 = fmt.Sprintf("%v", err.Error())
 							automate_plugin.PluginScreenShotError(conctRemote, contentTesting, userSignIn,
-								testingRepo, plusInfoActionTesting)
+								testingRepo, plusInfoActionTesting, restClient)
 							log.Error(err.Error())
 							return err
 						}
@@ -309,19 +323,21 @@ func (s *Selenium) RobotAutoImpl(contentTesting testing.YamlTesting, userSignIn 
 							Page:            fmt.Sprintf("%v", vHook.Field(0)),
 							OrdinalStep:     0,
 							DescriptionStep: fmt.Sprintf("%v", description),
-							JobID:           jobID,
+							JobID:           job.JobId,
 							TestId:          testId.String(),
 							WebDriver:       fmt.Sprintf("%v", webDriver),
 							Script:          fmt.Sprintf("%v", script),
 							Action:          "",
 							Data:            "",
+							AlertTelegram: job.AlertTelegram,
+							TelegramInfo: teleInfo,
 						}
 						err := automate_plugin.ExecuteScript(conctRemote, contentTesting, userSignIn,
 							testingRepo, plusInfoActionTesting)
 						if err != nil {
 							plusInfoActionTesting.Data1 = fmt.Sprintf("%v", err.Error())
 							automate_plugin.PluginScreenShotError(conctRemote, contentTesting, userSignIn,
-								testingRepo, plusInfoActionTesting)
+								testingRepo, plusInfoActionTesting, restClient)
 							log.Error(err.Error())
 							return err
 						}
@@ -332,19 +348,21 @@ func (s *Selenium) RobotAutoImpl(contentTesting testing.YamlTesting, userSignIn 
 							Page:            fmt.Sprintf("%v", vHook.Field(0)),
 							OrdinalStep:     0,
 							DescriptionStep: fmt.Sprintf("%v", description),
-							JobID:           jobID,
+							JobID:           job.JobId,
 							TestId:          testId.String(),
 							WebDriver:       fmt.Sprintf("%v", webDriver),
 							Timeout:         fmt.Sprintf("%v", timeout),
 							Action:          "",
 							Data:            "",
+							AlertTelegram: job.AlertTelegram,
+							TelegramInfo: teleInfo,
 						}
 						err := automate_plugin.SleepAction(conctRemote, contentTesting, userSignIn,
 							testingRepo, plusInfoActionTesting)
 						if err != nil {
 							plusInfoActionTesting.Data1 = fmt.Sprintf("%v", err.Error())
 							automate_plugin.PluginScreenShotError(conctRemote, contentTesting, userSignIn,
-								testingRepo, plusInfoActionTesting)
+								testingRepo, plusInfoActionTesting, restClient)
 							log.Error(err.Error())
 							return err
 						}
@@ -355,19 +373,21 @@ func (s *Selenium) RobotAutoImpl(contentTesting testing.YamlTesting, userSignIn 
 							Page:            fmt.Sprintf("%v", vHook.Field(0)),
 							OrdinalStep:     0,
 							DescriptionStep: fmt.Sprintf("%v", description),
-							JobID:           jobID,
+							JobID:           job.JobId,
 							TestId:          testId.String(),
 							WebDriver:       fmt.Sprintf("%v", webDriver),
 							Timeout:         fmt.Sprintf("%v", timeout),
 							Action:          "",
 							Data:            "",
+							AlertTelegram: job.AlertTelegram,
+							TelegramInfo: teleInfo,
 						}
 						err := automate_plugin.Screenshot(conctRemote, contentTesting, userSignIn,
 							testingRepo, plusInfoActionTesting)
 						if err != nil {
 							plusInfoActionTesting.Data1 = fmt.Sprintf("%v", err.Error())
 							automate_plugin.PluginScreenShotError(conctRemote, contentTesting, userSignIn,
-								testingRepo, plusInfoActionTesting)
+								testingRepo, plusInfoActionTesting, restClient)
 							log.Error(err.Error())
 							return err
 						}
@@ -377,19 +397,21 @@ func (s *Selenium) RobotAutoImpl(contentTesting testing.YamlTesting, userSignIn 
 							Page:            fmt.Sprintf("%v", vHook.Field(0)),
 							OrdinalStep:     0,
 							DescriptionStep: fmt.Sprintf("%v", description),
-							JobID:           jobID,
+							JobID:           job.JobId,
 							TestId:          testId.String(),
 							WebDriver:       fmt.Sprintf("%v", webDriver),
 							NewUrl:          fmt.Sprintf("%v", newUrl),
 							Action:          "",
 							Data:            "",
+							AlertTelegram: job.AlertTelegram,
+							TelegramInfo: teleInfo,
 						}
 						err := automate_plugin.AccessNewUrl(conctRemote, contentTesting, userSignIn,
 							testingRepo, plusInfoActionTesting)
 						if err != nil {
 							plusInfoActionTesting.Data1 = fmt.Sprintf("%v", err.Error())
 							automate_plugin.PluginScreenShotError(conctRemote, contentTesting, userSignIn,
-								testingRepo, plusInfoActionTesting)
+								testingRepo, plusInfoActionTesting, restClient)
 							log.Error(err.Error())
 							return err
 						}

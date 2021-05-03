@@ -1,19 +1,23 @@
 package main
 
 import (
+	"fmt"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/swaggo/echo-swagger"
 	"os"
-	"selenium-check-awingu/db"
 	_ "selenium-check-awingu/docs"
-
+	"selenium-check-awingu/db"
 	"selenium-check-awingu/handler"
 	"selenium-check-awingu/helper"
 	"selenium-check-awingu/helper/automate/automate_impl"
+	"selenium-check-awingu/helper/restclient/restclient_impl"
+	"selenium-check-awingu/helper/schedule"
+	"selenium-check-awingu/helper/schedule/schedule_impl"
 	"selenium-check-awingu/log"
 	"selenium-check-awingu/repository/repo_impl"
 	"selenium-check-awingu/router"
+	"time"
 )
 
 func init() {
@@ -60,8 +64,31 @@ func main() {
 		ConnectServer: connectStrSelenium,
 	}
 
+	scheduleNim := &schedule.GoCron{
+		ZoneName:     "VietNam",
+		SecondsOfUTC: 7*60*60,
+	}
+
+	connectMyApi, exists := os.LookupEnv("CONNECT_MY_API")
+	if !(exists) {
+		log.Error(exists)
+		return
+	}
+	urlNim := restclient_impl.Resty{Url: connectMyApi}
+
+	//Database
 	sql.Connect()
 	defer sql.Close()
+
+	//Scheduler
+	scheduleNim.GetGoCron()
+
+	connectTelegramApi, exists := os.LookupEnv("CONNECT_TELEGRAM_API")
+	if !(exists) {
+		log.Error(exists)
+		return
+	}
+	urlTelegramApi := restclient_impl.Resty{Url: connectTelegramApi}
 
 	e := echo.New()
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
@@ -78,10 +105,23 @@ func main() {
 	testingHandler := handler.TestingHandler{
 		TestingRepo: repo_impl.NewTestingRepo(sql),
 		Automate:    automate_impl.NewSelenium(seConNim),
+		AlertRepo: repo_impl.NewAlertRepo(sql),
+		RestClient: restclient_impl.NewResty(urlTelegramApi),
 	}
 
 	reportTestingHandler := handler.ReportTestingHandler{
 		ReportTestingRepo: repo_impl.NewReportTestingRepo(sql),
+	}
+
+	scheduleTestingHandler := handler.ScheduleTestingHandler{
+		ScheduleTestingRepo : repo_impl.NewScheduleTestingRepo(sql),
+		ScheduleHelper: schedule_impl.NewTestingSchedule(scheduleNim),
+		RestClientHelper: restclient_impl.NewResty(urlNim),
+	}
+
+	alertHandler := handler.AlertHandler{
+		AlertRepo: repo_impl.NewAlertRepo(sql),
+		TestingRepo: repo_impl.NewTestingRepo(sql),
 	}
 
 	api := router.API{
@@ -89,10 +129,28 @@ func main() {
 		AutoTestingHandler:   autoTestingHandler,
 		TestingHandler:       testingHandler,
 		ReportTestingHandler: reportTestingHandler,
+		ScheduleTestingHandler: scheduleTestingHandler,
+		AlertHandler: alertHandler,
 	}
 	api.SetupRouter()
 
-	//autoTestingHandler.HandlerTestingConcurrency()
+	scheduleTestingHandler.HandlerSignalSchedule()
+	//scheduleTestingHandler.HandlerScheduleAtSpecificTime()
+
+	go intervalScanSchedule(30*time.Second, scheduleTestingHandler)
 
 	e.Logger.Fatal(e.Start(":7000"))
+}
+
+func intervalScanSchedule(timeSchedule time.Duration, handler handler.ScheduleTestingHandler) {
+	ticker := time.NewTicker(timeSchedule)
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				fmt.Println("Scan schedule...")
+				handler.HandlerScheduleAtSpecificTime()
+			}
+		}
+	}()
 }

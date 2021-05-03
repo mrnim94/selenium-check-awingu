@@ -23,15 +23,14 @@ func NewReportTestingRepo(sql *db.Sql) repository.ReportTestingRepo {
 
 func (rt *ReportTestingRepoImpl) SelectAllJobsTesting(context context.Context, jobId string) ([]report.ReportJobsTesting, error) {
 	jobsT := []report.ReportJobsTesting{}
-	log.Info("thực hiện lấy " + jobId + " Jobs Testing trong DB")
+	//log.Info("thực hiện lấy " + jobId + " Jobs Testing trong DB")
 	err := rt.sql.Db.SelectContext(context, &jobsT,
-		`SELECT jobs_testing.job_id, jobs_testing.job_name, jobs_testing.status,
-						jobs_github.owner, jobs_github.repo, jobs_github.path--,
-						--true as jobs_github
+		`SELECT jobs_testing.job_id, jobs_testing.job_name, jobs_testing.status, jobs_testing.alert_telegram,
+						jobs_github.owner, jobs_github.repo, jobs_github.path
 				FROM jobs_testing
 				INNER JOIN jobs_github
 				ON jobs_testing.job_id = jobs_github.job_id
-		`) // true as jobs_github nếu bẳng jobs_github thì nó trả lại là t
+		`) // true as jobs_github nếu bẳng jobs_github thì nó trả lại là true
 
 	if err != nil {
 		if err == sql.ErrNoRows {
